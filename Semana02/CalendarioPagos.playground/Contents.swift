@@ -23,3 +23,9 @@ let cantidad = Int(readLine() ?? "0") ?? 0
 
 let subtotal = precio * Double(cantidad)
 let descuento = CalcularDescuento(cantidad: cantidad, subtotal: subtotal)
+
+let montobase = subtotal - descuento
+let montoIgv = montobase * igv
+let total = montobase + montoIgv
+
+print("El monto total a pagar es: \(total)")
