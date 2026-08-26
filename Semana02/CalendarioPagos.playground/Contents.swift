@@ -54,4 +54,11 @@ let cuota = montoFinanciado / Double(plan)
 print("producto: \(producto)      interes: \(interes)      cuota: \(cuota)")
 print("monto compra: \(total)      monto financiado: \(montoFinanciado)")
 
+print("mes | monto inicial | cuota mensual | resta por pago")
+var saldo = montoFinanciado
+for mes in 1...plan {
+    let montoInicial = saldo
+    saldo -= cuota
+    print("\(mes) | \(montoInicial) | \(cuota) | \(saldo)")
+}
 
