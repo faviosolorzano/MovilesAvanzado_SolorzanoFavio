@@ -1,5 +1,7 @@
 import UIKit
 
+/*
+
 // ===== EJERCICIO 6: CARRITO MEJORADO (ASISTIDO POR IA) =====
 
 // --- Datos de productos (mismos del ejercicio 5, para mantener consistencia) ---
@@ -97,4 +99,64 @@ if !hayError { // Solo se ejecuta el cálculo del carrito si no se encontró nin
     print("TOTAL FINAL: S/. \(totalFinal)") // Muestra el monto final que el cliente debe pagar
     print("Puntos de fidelidad ganados: \(puntosFidelidad)") // Muestra los puntos de fidelidad obtenidos
     print("========================================") // Línea separadora final del ticket
+}
+
+*/
+
+
+// ===== EJERCICIO 7: JUEGO DE ADIVINANZA (ASISTIDO POR IA) =====
+
+let numeroSecreto = 42 // Número fijo que el jugador debe adivinar
+
+// --- Simulación de 5 intentos con variables (no hay input real en Playground) ---
+let intentoJuego1 = 20 // Primer intento del jugador
+let intentoJuego2 = 50 // Segundo intento del jugador
+let intentoJuego3 = 35 // Tercer intento del jugador
+let intentoJuego4 = 45 // Cuarto intento del jugador
+let intentoJuego5 = 42 // Quinto intento del jugador (coincide con el número secreto)
+
+// --- Arreglo simple simulado con variables individuales, recorrido con un contador ---
+var numeroDeIntento = 1 // Contador que lleva el número de intento actual (empieza en 1)
+var adivinado = false // Bandera que indica si el jugador ya adivinó el número
+
+// Requisito 3: usar while para recorrer los intentos
+while numeroDeIntento <= 5 && !adivinado {
+    // El bucle se repite mientras no se pase de 5 intentos y no se haya adivinado
+
+    var intentoActual = 0 // Variable que va a guardar el valor del intento actual dentro del bucle
+
+    // Selecciona qué intento le corresponde según el número de vuelta del bucle
+    if numeroDeIntento == 1 {
+        intentoActual = intentoJuego1 // En la primera vuelta, usa el primer intento
+    } else if numeroDeIntento == 2 {
+        intentoActual = intentoJuego2 // En la segunda vuelta, usa el segundo intento
+    } else if numeroDeIntento == 3 {
+        intentoActual = intentoJuego3 // En la tercera vuelta, usa el tercer intento
+    } else if numeroDeIntento == 4 {
+        intentoActual = intentoJuego4 // En la cuarta vuelta, usa el cuarto intento
+    } else if numeroDeIntento == 5 {
+        intentoActual = intentoJuego5 // En la quinta vuelta, usa el quinto intento
+    }
+
+    // Requisito 4: mostrar si el número es "Muy alto", "Muy bajo" o "¡Correcto!"
+    if intentoActual == numeroSecreto {
+        print("Intento \(numeroDeIntento): \(intentoActual) -> ¡Correcto!") // El intento coincide exactamente con el número secreto
+        adivinado = true // Activa la bandera para detener el bucle en la siguiente comprobación
+    } else if intentoActual > numeroSecreto {
+        print("Intento \(numeroDeIntento): \(intentoActual) -> Muy alto") // El intento es mayor que el número secreto
+    } else {
+        print("Intento \(numeroDeIntento): \(intentoActual) -> Muy bajo") // El intento es menor que el número secreto
+    }
+
+    // Requisito 5: contar cuántos intentos necesitó
+    if !adivinado {
+        numeroDeIntento += 1 // Solo avanza al siguiente intento si todavía no adivinó
+    }
+}
+
+// --- Requisito 6: mostrar resultado final del juego ---
+if adivinado {
+    print("¡Ganaste! Adivinaste el número en \(numeroDeIntento) intento(s)") // Informa en cuántos intentos ganó
+} else {
+    print("Perdiste. El número era: \(numeroSecreto)") // Informa que se acabaron los 5 intentos sin adivinar
 }
