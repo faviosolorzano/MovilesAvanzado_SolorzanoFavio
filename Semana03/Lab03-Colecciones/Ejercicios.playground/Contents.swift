@@ -149,7 +149,7 @@ print("Mayores de 21: \(mayores)")
 
 
 
-// Ejercicio 3 
+// Ejercicio 3
 
 // ===== TODO 8: Eliminar duplicados =====
 var numerosSet: [Int] = []
@@ -205,3 +205,51 @@ print(a.subtracting(b))  // PREDICT 7: [1, 2, 3]
 var repetidos: Set = ["A", "B", "A", "C", "B"]
 
 print(repetidos.count)   // PREDICT 8: 3
+
+
+
+// Ejercicio 4
+
+// ===== TODO 10: Inventario de productos =====
+
+var preciosInventario: [String: Double] = [:]
+var stocks: [String: Int] = [:]
+
+print("¿Cuántos productos?")
+let cantidadProductos = Int(readLine() ?? "") ?? 0
+
+for i in 1...cantidadProductos {
+    print("Producto \(i) - Nombre:")
+    let nombre = readLine() ?? ""
+
+    print("Precio:")
+    let precio = Double(readLine() ?? "") ?? 0
+
+    print("Stock:")
+    let stock = Int(readLine() ?? "") ?? 0
+
+    preciosInventario[nombre] = precio
+    stocks[nombre] = stock
+}
+
+// Calcular valor total (precio × stock)
+var valorTotalInventario = 0.0
+
+for (nombre, precio) in preciosInventario {
+    if let stock = stocks[nombre] {
+        valorTotalInventario += precio * Double(stock)
+    }
+}
+
+print("Valor total del inventario: S/. \(valorTotalInventario)")
+
+// Mostrar productos con stock < 5
+print("Productos con stock bajo:")
+
+for (nombre, stock) in stocks {
+    if stock < 5 {
+        print("\(nombre): \(stock) unidades")
+    }
+}
+
+
