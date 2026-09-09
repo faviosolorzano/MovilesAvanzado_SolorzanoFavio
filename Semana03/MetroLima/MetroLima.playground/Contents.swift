@@ -270,3 +270,339 @@ let conexiones: [Conexion] = [
         descripcion: "Conexión utilizada para la simulación L1 - L6"
     )
 ]
+
+
+// MARK: - Referencias
+
+let referencias: [Referencia] = [
+
+    Referencia(
+        nombre: "Emporio Comercial de Gamarra",
+        categoria: "Zona comercial",
+        estacion: "Gamarra",
+        linea: "L1",
+        orientacion: "Referencia principal para acceder al emporio comercial y a la Av. Aviación."
+    ),
+
+    Referencia(
+        nombre: "Av. Aviación",
+        categoria: "Avenida",
+        estacion: "Gamarra",
+        linea: "L1",
+        orientacion: "La estación se encuentra sobre el eje de la Av. Aviación."
+    ),
+
+    Referencia(
+        nombre: "Hospital María Auxiliadora",
+        categoria: "Hospital",
+        estacion: "María Auxiliadora",
+        linea: "L1",
+        orientacion: "Referencia útil para llegar al hospital y al sector de San Juan de Miraflores."
+    ),
+
+    Referencia(
+        nombre: "Óvalo Higuereta",
+        categoria: "Vía principal",
+        estacion: "Cabitos",
+        linea: "L1",
+        orientacion: "Punto vial conocido de la zona de Surco."
+    ),
+
+    Referencia(
+        nombre: "Gran Teatro Nacional",
+        categoria: "Cultura",
+        estacion: "La Cultura",
+        linea: "L1",
+        orientacion: "Referencia cultural importante del sector de San Borja."
+    ),
+
+    Referencia(
+        nombre: "Biblioteca Nacional del Perú",
+        categoria: "Biblioteca",
+        estacion: "La Cultura",
+        linea: "L1",
+        orientacion: "Referencia cultural ubicada en el sector de San Borja."
+    ),
+
+    Referencia(
+        nombre: "La Rambla San Borja",
+        categoria: "Centro comercial",
+        estacion: "La Cultura",
+        linea: "L1",
+        orientacion: "Centro comercial usado como referencia del sector."
+    ),
+
+    Referencia(
+        nombre: "Hospital Nacional Dos de Mayo",
+        categoria: "Hospital",
+        estacion: "Miguel Grau",
+        linea: "L1",
+        orientacion: "Referencia hospitalaria del eje de Av. Grau."
+    ),
+
+    Referencia(
+        nombre: "Cementerio Presbítero Maestro",
+        categoria: "Cementerio / patrimonio",
+        estacion: "Presbítero Maestro",
+        linea: "L1",
+        orientacion: "Referencia histórica y cultural de la zona."
+    ),
+
+    Referencia(
+        nombre: "Mall del Sur",
+        categoria: "Centro comercial",
+        estacion: "Atocongo",
+        linea: "L1",
+        orientacion: "Centro comercial del sector de San Juan de Miraflores."
+    ),
+
+    Referencia(
+        nombre: "Puerto del Callao",
+        categoria: "Puerto",
+        estacion: "Puerto del Callao",
+        linea: "L2",
+        orientacion: "Referencia principal de la zona portuaria."
+    ),
+
+    Referencia(
+        nombre: "Universidad Nacional Mayor de San Marcos",
+        categoria: "Universidad",
+        estacion: "San Marcos",
+        linea: "L2",
+        orientacion: "Referencia educativa importante de la zona."
+    ),
+
+    Referencia(
+        nombre: "Plaza Bolognesi",
+        categoria: "Plaza",
+        estacion: "Plaza Bolognesi",
+        linea: "L2",
+        orientacion: "Punto conocido del Cercado de Lima."
+    ),
+
+    Referencia(
+        nombre: "Real Plaza Centro Cívico",
+        categoria: "Centro comercial",
+        estacion: "Estación Central",
+        linea: "L2",
+        orientacion: "Referencia comercial importante del Centro de Lima."
+    ),
+
+    Referencia(
+        nombre: "Centro de Lima",
+        categoria: "Zona urbana",
+        estacion: "Estación Central",
+        linea: "L2",
+        orientacion: "Referencia para llegar a zonas del centro histórico."
+    ),
+
+    Referencia(
+        nombre: "Puente Santa Anita",
+        categoria: "Puente / vía",
+        estacion: "Evitamiento",
+        linea: "L2",
+        orientacion: "Referencia vial cercana al cruce de Nicolás Ayllón con Vía de Evitamiento."
+    ),
+
+    Referencia(
+        nombre: "Mall Aventura Santa Anita",
+        categoria: "Centro comercial",
+        estacion: "Evitamiento",
+        linea: "L2",
+        orientacion: "Centro comercial usado como referencia del sector de Santa Anita."
+    ),
+
+    Referencia(
+        nombre: "Av. Nicolás Ayllón",
+        categoria: "Avenida",
+        estacion: "Evitamiento",
+        linea: "L2",
+        orientacion: "La estación se encuentra en este eje vial."
+    ),
+
+    Referencia(
+        nombre: "Vía de Evitamiento",
+        categoria: "Vía principal",
+        estacion: "Evitamiento",
+        linea: "L2",
+        orientacion: "Referencia vial principal para reconocer la zona."
+    ),
+
+    Referencia(
+        nombre: "Óvalo Santa Anita",
+        categoria: "Óvalo",
+        estacion: "Óvalo Santa Anita",
+        linea: "L2",
+        orientacion: "Referencia principal de la zona."
+    ),
+
+    Referencia(
+        nombre: "Hospital Hermilio Valdizán",
+        categoria: "Hospital",
+        estacion: "Hermilio Valdizán",
+        linea: "L2",
+        orientacion: "Referencia de salud asociada a la estación."
+    ),
+
+    Referencia(
+        nombre: "Mercado Mayorista de Santa Anita",
+        categoria: "Mercado",
+        estacion: "Mercado Santa Anita",
+        linea: "L2",
+        orientacion: "Referencia comercial importante de Lima Este."
+    ),
+
+    Referencia(
+        nombre: "Av. Javier Prado",
+        categoria: "Avenida",
+        estacion: "Prolongación Javier Prado",
+        linea: "L2",
+        orientacion: "Eje vial importante para orientarse en Lima Este."
+    ),
+
+    Referencia(
+        nombre: "Circuito Mágico del Agua",
+        categoria: "Parque / turismo",
+        estacion: "Parque de la Reserva",
+        linea: "L3",
+        orientacion: "Referencia turística del Parque de la Reserva."
+    ),
+
+    Referencia(
+        nombre: "Av. Javier Prado",
+        categoria: "Avenida",
+        estacion: "Conde de San Isidro",
+        linea: "L3",
+        orientacion: "Cruce importante con Av. Arequipa."
+    ),
+
+    Referencia(
+        nombre: "Aeropuerto Internacional Jorge Chávez",
+        categoria: "Aeropuerto",
+        estacion: "Aeropuerto",
+        linea: "L4",
+        orientacion: "Principal referencia del ramal aeroportuario."
+    ),
+
+    Referencia(
+        nombre: "Huaca Pucllana",
+        categoria: "Sitio arqueológico",
+        estacion: "Huaca Pucllana",
+        linea: "L5",
+        orientacion: "Referencia turística usada dentro de la simulación."
+    ),
+
+    Referencia(
+        nombre: "Parque Central de Miraflores",
+        categoria: "Parque",
+        estacion: "Parque Central",
+        linea: "L5",
+        orientacion: "Referencia céntrica de Miraflores dentro de la simulación."
+    ),
+
+    Referencia(
+        nombre: "Centro de Barranco",
+        categoria: "Zona urbana",
+        estacion: "Barranco",
+        linea: "L5",
+        orientacion: "Referencia cultural y turística dentro de la simulación."
+    ),
+
+    Referencia(
+        nombre: "Universidad de Lima",
+        categoria: "Universidad",
+        estacion: "Universidad de Lima",
+        linea: "L6",
+        orientacion: "Referencia educativa dentro de la simulación."
+    ),
+
+    Referencia(
+        nombre: "Camacho",
+        categoria: "Zona comercial",
+        estacion: "Camacho",
+        linea: "L6",
+        orientacion: "Referencia comercial dentro de la simulación."
+    )
+]
+
+
+// MARK: - Funciones auxiliares
+
+func normalizarTexto(_ texto: String) -> String {
+    return texto
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+        .folding(
+            options: [.diacriticInsensitive, .caseInsensitive],
+            locale: Locale(identifier: "es_PE")
+        )
+        .lowercased()
+}
+
+func normalizarLinea(_ texto: String) -> String {
+    return normalizarTexto(texto).uppercased()
+}
+
+func estacionesDeLinea(_ codigo: String) -> [Estacion] {
+    return estacionesPorLinea[normalizarLinea(codigo)] ?? []
+}
+
+func buscarEstaciones(
+    _ nombre: String
+) -> [(linea: String, estacion: Estacion)] {
+
+    let buscado = normalizarTexto(nombre)
+
+    var resultados:
+        [(linea: String, estacion: Estacion)] = []
+
+    for (codigo, estaciones) in estacionesPorLinea {
+
+        for estacion in estaciones {
+
+            if normalizarTexto(estacion.nombre) == buscado {
+
+                resultados.append(
+                    (
+                        linea: codigo,
+                        estacion: estacion
+                    )
+                )
+            }
+        }
+    }
+
+    return resultados.sorted {
+        $0.linea < $1.linea
+    }
+}
+
+func referenciasDeEstacion(
+    _ nombre: String
+) -> [Referencia] {
+
+    let buscado = normalizarTexto(nombre)
+
+    return referencias.filter {
+        normalizarTexto($0.estacion) == buscado
+    }
+}
+
+func buscarLugar(
+    _ texto: String
+) -> [Referencia] {
+
+    let buscado = normalizarTexto(texto)
+
+    return referencias.filter {
+
+        normalizarTexto($0.nombre).contains(buscado)
+
+        ||
+
+        normalizarTexto($0.categoria).contains(buscado)
+
+        ||
+
+        normalizarTexto($0.orientacion).contains(buscado)
+    }
+}
