@@ -1901,3 +1901,109 @@ func flujoIrAUnLugar() {
         }
     }
 }
+
+
+
+// MARK: - Menú principal
+
+func ejecutarMenu() {
+
+    var continuar = true
+
+    while continuar {
+
+        print(
+        """
+
+        ========================================
+             METRO DE LIMA Y CALLAO
+        ========================================
+          Sistema académico de orientación
+
+        1. Ver todas las líneas
+        2. Ver estaciones de una línea
+        3. Buscar una estación
+        4. Consultar conexión entre líneas
+        5. Buscar ruta entre estaciones
+        6. Buscar un lugar o referencia
+        7. Ir desde una estación hasta un lugar
+        8. Ver todas las conexiones
+        0. Salir
+
+        ========================================
+        """
+        )
+
+        let opcion = pedir(
+            "Seleccione una opción:"
+        )
+
+        switch normalizarTexto(opcion) {
+
+        case "1":
+
+            mostrarLineas()
+
+            print(
+                "\nPresiona Enter para volver al menú..."
+            )
+
+            _ = readLine()
+
+        case "2":
+
+            flujoEstacionesPorLinea()
+
+        case "3":
+
+            flujoBuscarEstacion()
+
+        case "4":
+
+            flujoConsultarConexion()
+
+        case "5":
+
+            flujoBuscarRuta()
+
+        case "6":
+
+            flujoBuscarLugar()
+
+        case "7":
+
+            flujoIrAUnLugar()
+
+        case "8":
+
+            mostrarTodasLasConexiones()
+
+            print(
+                "\nPresiona Enter para volver al menú..."
+            )
+
+            _ = readLine()
+
+        case "0":
+
+            continuar = false
+
+            print(
+                "\nGracias por utilizar el sistema."
+            )
+
+        default:
+
+            print("""
+            
+            Opción no válida.
+            Ingresa un número entre 0 y 8.
+            """)
+        }
+    }
+}
+
+
+// MARK: - Inicio
+
+ejecutarMenu()
