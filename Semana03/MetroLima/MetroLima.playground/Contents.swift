@@ -978,3 +978,926 @@ func buscarRuta(
         "No se encontró una ruta con las conexiones registradas."
     )
 }
+
+
+// MARK: - Funciones de presentación
+
+func titulo(_ texto: String) {
+    print("\n========================================")
+    print(texto)
+    print("========================================")
+}
+
+func pedir(_ mensaje: String) -> String {
+    print(mensaje, terminator: " ")
+    return readLine() ?? ""
+}
+
+func mostrarLineas() {
+
+    titulo("LÍNEAS DEL METRO DE LIMA Y CALLAO")
+
+    print("Total de líneas: \(lineas.count)\n")
+
+    for codigo in lineas.keys.sorted() {
+
+        guard let linea = lineas[codigo] else {
+            continue
+        }
+
+        print("\(codigo) - \(linea.nombre)")
+        print("Recorrido: \(linea.recorrido)")
+        print("Estaciones cargadas: \(estacionesDeLinea(codigo).count)")
+        print("Datos: \(linea.tipoDato.rawValue)\n")
+    }
+}
+
+func mostrarEstacionesDeLinea(_ codigo: String) {
+
+    let clave = normalizarLinea(codigo)
+
+    guard let linea = lineas[clave] else {
+        print("La línea ingresada no existe.")
+        return
+    }
+
+    let estaciones = estacionesDeLinea(clave)
+
+    titulo("\(linea.nombre.uppercased()) - ESTACIONES")
+
+    print("Recorrido: \(linea.recorrido)")
+    print("Cantidad: \(estaciones.count)\n")
+
+    for (indice, estacion) in estaciones.enumerated() {
+        print("\(indice + 1). \(estacion.nombre)")
+    }
+}
+
+func mostrarInformacionEstacion(_ nombre: String) {
+
+    let resultados = buscarEstaciones(nombre)
+
+    guard !resultados.isEmpty else {
+        print("No se encontró la estación ingresada.")
+        return
+    }
+
+    let estacionPrincipal = resultados[0].estacion
+
+    titulo("ESTACIÓN: \(estacionPrincipal.nombre.uppercased())")
+
+    let lineasEncontradas = Set(
+        resultados.map {
+            $0.linea
+        }
+    ).sorted()
+
+    print(
+        "Línea(s): \(lineasEncontradas.joined(separator: ", "))"
+    )
+
+    print(
+        "Zona / distrito: \(estacionPrincipal.distrito)"
+    )
+
+    print(
+        "Referencia principal: \(estacionPrincipal.referenciaPrincipal)"
+    )
+
+    let refs = referenciasDeEstacion(
+        estacionPrincipal.nombre
+    )
+
+    print("\n¿QUÉ HAY CERCA?")
+
+    if refs.isEmpty {
+
+        print("- No hay referencias adicionales registradas.")
+
+    } else {
+
+        for ref in refs {
+            print("- \(ref.nombre)")
+            print("  Tipo: \(ref.categoria)")
+            print("  \(ref.orientacion)")
+        }
+    }
+
+    let clave = normalizarTexto(
+        estacionPrincipal.nombre
+    )
+
+    let conexionesRelacionadas = conexiones.filter {
+
+        normalizarTexto($0.estacionA) == clave
+        ||
+        normalizarTexto($0.estacionB) == clave
+    }
+
+    print("\nCONEXIONES")
+
+    if conexionesRelacionadas.isEmpty {
+
+        print("- No tiene conexiones registradas con otras líneas.")
+
+    } else {
+
+        for conexion in conexionesRelacionadas {
+
+            print(
+                "- \(conexion.lineaA) [\(conexion.estacionA)] ↔ \(conexion.lineaB) [\(conexion.estacionB)]"
+            )
+        }
+    }
+}
+
+func mostrarConexion(
+    _ lineaA: String,
+    _ lineaB: String
+) {
+
+    let a = normalizarLinea(lineaA)
+    let b = normalizarLinea(lineaB)
+
+    guard
+        lineas[a] != nil,
+        lineas[b] != nil
+    else {
+        print("Una de las líneas ingresadas no existe.")
+        return
+    }
+
+    guard a != b else {
+        print("Debes ingresar dos líneas diferentes.")
+        return
+    }
+
+    let lista = conexionesEntre(a, b)
+
+    guard !lista.isEmpty else {
+        print("No hay conexiones registradas entre \(a) y \(b).")
+        return
+    }
+
+    titulo("CONEXIONES ENTRE \(a) Y \(b)")
+
+    print(
+        "Se encontraron \(lista.count) conexión(es):\n"
+    )
+
+    for (indice, conexion) in lista.enumerated() {
+
+        print("\(indice + 1). \(conexion.estacionA)")
+
+        if conexion.estacionA == conexion.estacionB {
+
+            print(
+                "   \(conexion.lineaA) ↔ \(conexion.lineaB)"
+            )
+
+        } else {
+
+            print(
+                "   \(conexion.lineaA): \(conexion.estacionA)"
+            )
+
+            print(
+                "   \(conexion.lineaB): \(conexion.estacionB)"
+            )
+        }
+
+        print(
+            "   \(conexion.descripcion)\n"
+        )
+    }
+}
+
+func mostrarTodasLasConexiones() {
+
+    titulo("TODAS LAS CONEXIONES")
+
+    for (indice, conexion) in conexiones.enumerated() {
+
+        print(
+            "\(indice + 1). \(conexion.lineaA) [\(conexion.estacionA)] ↔ \(conexion.lineaB) [\(conexion.estacionB)]"
+        )
+
+        print(
+            "   \(conexion.descripcion)"
+        )
+    }
+}
+
+
+
+// MARK: - Flujos interactivos
+
+func flujoEstacionesPorLinea() {
+
+    while true {
+
+        titulo("ESTACIONES POR LÍNEA")
+
+        print("""
+        Líneas disponibles:
+        L1 - L2 - L3 - L4 - L5 - L6
+
+        Escribe 0 para volver.
+        """)
+
+        let codigo = pedir("Ingrese una línea:")
+
+        if normalizarTexto(codigo) == "0" {
+            return
+        }
+
+        let linea = normalizarLinea(codigo)
+
+        guard lineas[linea] != nil else {
+
+            print(
+                "\nLa línea ingresada no existe. Intenta nuevamente."
+            )
+
+            continue
+        }
+
+        mostrarEstacionesDeLinea(linea)
+
+        print("""
+        
+        1. Consultar otra línea
+        0. Volver al menú
+        """)
+
+        while true {
+
+            let opcion = pedir("Seleccione una opción:")
+
+            if opcion == "1" {
+                break
+            }
+
+            if opcion == "0" {
+                return
+            }
+
+            print(
+                "Opción no válida. Intenta nuevamente."
+            )
+        }
+    }
+}
+
+func flujoBuscarEstacion() {
+
+    while true {
+
+        titulo("BUSCAR ESTACIÓN")
+
+        print("""
+        Ejemplos:
+        - Gamarra
+        - Evitamiento
+        - La Cultura
+        - Cabitos
+        - San Marcos
+
+        Escribe 0 para volver.
+        """)
+
+        let entrada = pedir("Estación:")
+
+        if normalizarTexto(entrada) == "0" {
+            return
+        }
+
+        let resultados = buscarEstaciones(entrada)
+
+        if resultados.isEmpty {
+
+            print(
+                "\nNo se encontró esa estación."
+            )
+
+            print(
+                "Verifica el nombre e intenta nuevamente."
+            )
+
+            continue
+        }
+
+        mostrarInformacionEstacion(entrada)
+
+        while true {
+
+            print("""
+            
+            ¿Qué deseas hacer?
+
+            1. Buscar otra estación
+            2. Calcular ruta hacia esta estación
+            0. Volver al menú
+            """)
+
+            let opcion = pedir("Seleccione una opción:")
+
+            switch opcion {
+
+            case "1":
+                break
+
+            case "2":
+
+                while true {
+
+                    let origen = pedir(
+                        "¿Desde qué estación partes? (0 para cancelar):"
+                    )
+
+                    if normalizarTexto(origen) == "0" {
+                        break
+                    }
+
+                    if buscarEstaciones(origen).isEmpty {
+
+                        print(
+                            "No encontramos esa estación de origen."
+                        )
+
+                        continue
+                    }
+
+                    buscarRuta(
+                        origen: origen,
+                        destino: resultados[0]
+                            .estacion
+                            .nombre
+                    )
+
+                    break
+                }
+
+            case "0":
+                return
+
+            default:
+
+                print(
+                    "Opción no válida."
+                )
+
+                continue
+            }
+
+            break
+        }
+    }
+}
+
+func flujoConsultarConexion() {
+
+    while true {
+
+        titulo("CONSULTAR CONEXIÓN")
+
+        print("""
+        Ejemplo:
+        Primera línea: L2
+        Segunda línea: L4
+
+        Escribe 0 para volver.
+        """)
+
+        let lineaA = pedir("Primera línea:")
+
+        if normalizarTexto(lineaA) == "0" {
+            return
+        }
+
+        guard
+            lineas[
+                normalizarLinea(lineaA)
+            ] != nil
+        else {
+
+            print(
+                "La primera línea no existe."
+            )
+
+            continue
+        }
+
+        let lineaB = pedir("Segunda línea:")
+
+        if normalizarTexto(lineaB) == "0" {
+            return
+        }
+
+        guard
+            lineas[
+                normalizarLinea(lineaB)
+            ] != nil
+        else {
+
+            print(
+                "La segunda línea no existe."
+            )
+
+            continue
+        }
+
+        mostrarConexion(
+            lineaA,
+            lineaB
+        )
+
+        while true {
+
+            print("""
+            
+            1. Consultar otra conexión
+            0. Volver al menú
+            """)
+
+            let opcion = pedir("Seleccione una opción:")
+
+            if opcion == "1" {
+                break
+            }
+
+            if opcion == "0" {
+                return
+            }
+
+            print(
+                "Opción no válida."
+            )
+        }
+    }
+}
+
+func flujoBuscarRuta() {
+
+    while true {
+
+        titulo("BUSCAR RUTA")
+
+        print("""
+        Ejemplo:
+        Origen: Gamarra
+        Destino: Evitamiento
+
+        Escribe 0 para volver.
+        """)
+
+        var origenValido: String?
+
+        while origenValido == nil {
+
+            let origen = pedir("Estación de origen:")
+
+            if normalizarTexto(origen) == "0" {
+                return
+            }
+
+            if buscarEstaciones(origen).isEmpty {
+
+                print(
+                    "No se encontró esa estación de origen."
+                )
+
+            } else {
+
+                origenValido = origen
+            }
+        }
+
+        var destinoValido: String?
+
+        while destinoValido == nil {
+
+            let destino = pedir("Estación de destino:")
+
+            if normalizarTexto(destino) == "0" {
+                return
+            }
+
+            if buscarEstaciones(destino).isEmpty {
+
+                print(
+                    "No se encontró esa estación de destino."
+                )
+
+            } else {
+
+                destinoValido = destino
+            }
+        }
+
+        if let origen = origenValido,
+           let destino = destinoValido {
+
+            buscarRuta(
+                origen: origen,
+                destino: destino
+            )
+        }
+
+        while true {
+
+            print("""
+            
+            1. Buscar otra ruta
+            0. Volver al menú
+            """)
+
+            let opcion = pedir("Seleccione una opción:")
+
+            if opcion == "1" {
+                break
+            }
+
+            if opcion == "0" {
+                return
+            }
+
+            print(
+                "Opción no válida."
+            )
+        }
+    }
+}
+
+func flujoDetalleReferencia(
+    _ referencia: Referencia
+) {
+
+    while true {
+
+        titulo(
+            referencia.nombre.uppercased()
+        )
+
+        print(
+            "Tipo: \(referencia.categoria)"
+        )
+
+        print(
+            "Estación relacionada: \(referencia.estacion)"
+        )
+
+        print(
+            "Línea: \(referencia.linea)"
+        )
+
+        print(
+            "Orientación: \(referencia.orientacion)"
+        )
+
+        print("""
+        
+        ¿Qué deseas hacer?
+
+        1. Ver información de la estación
+        2. Calcular ruta hacia este lugar
+        0. Volver
+        """)
+
+        let opcion = pedir("Seleccione una opción:")
+
+        switch opcion {
+
+        case "1":
+
+            mostrarInformacionEstacion(
+                referencia.estacion
+            )
+
+        case "2":
+
+            while true {
+
+                let origen = pedir(
+                    "¿Desde qué estación partes? (0 para cancelar):"
+                )
+
+                if normalizarTexto(origen) == "0" {
+                    break
+                }
+
+                if buscarEstaciones(origen).isEmpty {
+
+                    print(
+                        "No encontramos esa estación."
+                    )
+
+                    continue
+                }
+
+                titulo(
+                    "RUTA HACIA \(referencia.nombre.uppercased())"
+                )
+
+                buscarRuta(
+                    origen: origen,
+                    destino: referencia.estacion
+                )
+
+                print(
+                    "\nAl llegar:"
+                )
+
+                print(
+                    referencia.orientacion
+                )
+
+                break
+            }
+
+        case "0":
+            return
+
+        default:
+
+            print(
+                "Opción no válida."
+            )
+        }
+    }
+}
+
+func flujoBuscarLugar() {
+
+    while true {
+
+        titulo("BUSCAR LUGAR O REFERENCIA")
+
+        print("""
+        Puedes buscar por nombre o por tipo.
+
+        Ejemplos:
+        - hospital
+        - universidad
+        - centro comercial
+        - mall
+        - mercado
+        - parque
+        - aeropuerto
+        - Javier Prado
+        - Gamarra
+
+        Escribe 0 para volver.
+        """)
+
+        let texto = pedir("¿Qué estás buscando?:")
+
+        if normalizarTexto(texto) == "0" {
+            return
+        }
+
+        let resultados = buscarLugar(texto)
+
+        if resultados.isEmpty {
+
+            print(
+                "\nNo encontramos resultados para '\(texto)'."
+            )
+
+            print(
+                "Intenta con otra palabra."
+            )
+
+            continue
+        }
+
+        titulo(
+            "RESULTADOS PARA: \(texto.uppercased())"
+        )
+
+        for (indice, referencia) in resultados.enumerated() {
+
+            print(
+                "\(indice + 1). \(referencia.nombre)"
+            )
+
+            print(
+                "   Tipo: \(referencia.categoria)"
+            )
+
+            print(
+                "   Estación: \(referencia.estacion)"
+            )
+
+            print(
+                "   Línea: \(referencia.linea)\n"
+            )
+        }
+
+        print(
+            "0. Volver"
+        )
+
+        while true {
+
+            let seleccion = pedir(
+                "Selecciona un resultado:"
+            )
+
+            if seleccion == "0" {
+                break
+            }
+
+            guard
+                let numero = Int(seleccion),
+                numero >= 1,
+                numero <= resultados.count
+            else {
+
+                print(
+                    "Selección no válida."
+                )
+
+                continue
+            }
+
+            flujoDetalleReferencia(
+                resultados[
+                    numero - 1
+                ]
+            )
+
+            break
+        }
+    }
+}
+
+
+
+func flujoIrAUnLugar() {
+
+    while true {
+
+        titulo("IR DESDE UNA ESTACIÓN HASTA UN LUGAR")
+
+        print("""
+        Ejemplo:
+
+        Origen:
+        Gamarra
+
+        Lugar:
+        Mall Aventura
+
+        Escribe 0 para volver.
+        """)
+
+        let origen = pedir(
+            "¿Desde qué estación partes?:"
+        )
+
+        if normalizarTexto(origen) == "0" {
+            return
+        }
+
+        guard !buscarEstaciones(origen).isEmpty else {
+
+            print(
+                "No encontramos esa estación."
+            )
+
+            continue
+        }
+
+        let lugar = pedir(
+            "¿A qué lugar deseas llegar?:"
+        )
+
+        if normalizarTexto(lugar) == "0" {
+            return
+        }
+
+        let resultados = buscarLugar(lugar)
+
+        if resultados.isEmpty {
+
+            print(
+                "No encontramos ese lugar."
+            )
+
+            continue
+        }
+
+        var elegido: Referencia?
+
+        if resultados.count == 1 {
+
+            elegido = resultados[0]
+
+        } else {
+
+            titulo("VARIOS RESULTADOS")
+
+            for (indice, ref) in resultados.enumerated() {
+
+                print(
+                    "\(indice + 1). \(ref.nombre)"
+                )
+
+                print(
+                    "   Estación: \(ref.estacion)"
+                )
+
+                print(
+                    "   Línea: \(ref.linea)\n"
+                )
+            }
+
+            print(
+                "0. Cancelar"
+            )
+
+            while elegido == nil {
+
+                let seleccion = pedir(
+                    "Selecciona el destino:"
+                )
+
+                if seleccion == "0" {
+                    break
+                }
+
+                guard
+                    let numero = Int(seleccion),
+                    numero >= 1,
+                    numero <= resultados.count
+                else {
+
+                    print(
+                        "Opción no válida."
+                    )
+
+                    continue
+                }
+
+                elegido = resultados[
+                    numero - 1
+                ]
+            }
+        }
+
+        guard let destino = elegido else {
+            continue
+        }
+
+        titulo("CÓMO LLEGAR")
+
+        print(
+            "Lugar: \(destino.nombre)"
+        )
+
+        print(
+            "Estación relacionada: \(destino.estacion)"
+        )
+
+        print(
+            "Línea: \(destino.linea)\n"
+        )
+
+        buscarRuta(
+            origen: origen,
+            destino: destino.estacion
+        )
+
+        print(
+            "\nOrientación final:"
+        )
+
+        print(
+            destino.orientacion
+        )
+
+        while true {
+
+            print("""
+            
+            1. Buscar otro lugar
+            0. Volver al menú
+            """)
+
+            let opcion = pedir("Seleccione una opción:")
+
+            if opcion == "1" {
+                break
+            }
+
+            if opcion == "0" {
+                return
+            }
+
+            print(
+                "Opción no válida."
+            )
+        }
+    }
+}
