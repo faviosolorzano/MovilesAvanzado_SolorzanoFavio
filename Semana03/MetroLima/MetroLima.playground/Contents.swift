@@ -606,3 +606,375 @@ func buscarLugar(
         normalizarTexto($0.orientacion).contains(buscado)
     }
 }
+
+
+// MARK: - Funciones de conexiones
+
+func conexionesEntre(
+    _ lineaA: String,
+    _ lineaB: String
+) -> [Conexion] {
+
+    let a = normalizarLinea(lineaA)
+    let b = normalizarLinea(lineaB)
+
+    return conexiones.filter {
+
+        (
+            $0.lineaA == a &&
+            $0.lineaB == b
+        )
+
+        ||
+
+        (
+            $0.lineaA == b &&
+            $0.lineaB == a
+        )
+    }
+}
+
+func conexionesDeLinea(
+    _ linea: String
+) -> [Conexion] {
+
+    let codigo = normalizarLinea(linea)
+
+    return conexiones.filter {
+        $0.lineaA == codigo ||
+        $0.lineaB == codigo
+    }
+}
+
+func estacionConexion(
+    _ conexion: Conexion,
+    para linea: String
+) -> String {
+
+    return conexion.lineaA == normalizarLinea(linea)
+        ? conexion.estacionA
+        : conexion.estacionB
+}
+
+func otraLinea(
+    _ conexion: Conexion,
+    desde linea: String
+) -> String {
+
+    return conexion.lineaA == normalizarLinea(linea)
+        ? conexion.lineaB
+        : conexion.lineaA
+}
+
+
+// MARK: - Rutas
+
+func recorridoEntre(
+    _ origen: String,
+    _ destino: String,
+    en linea: String
+) -> [String]? {
+
+    let estaciones = estacionesDeLinea(linea)
+
+    let origenClave = normalizarTexto(origen)
+    let destinoClave = normalizarTexto(destino)
+
+    guard
+        let inicio = estaciones.firstIndex(
+            where: {
+                normalizarTexto($0.nombre) == origenClave
+            }
+        ),
+
+        let fin = estaciones.firstIndex(
+            where: {
+                normalizarTexto($0.nombre) == destinoClave
+            }
+        )
+    else {
+        return nil
+    }
+
+    if inicio <= fin {
+
+        return estaciones[
+            inicio...fin
+        ]
+        .map {
+            $0.nombre
+        }
+
+    } else {
+
+        return estaciones[
+            fin...inicio
+        ]
+        .reversed()
+        .map {
+            $0.nombre
+        }
+    }
+}
+
+func imprimirTramo(
+    desde origen: String,
+    hasta destino: String,
+    linea: String
+) {
+
+    if let recorrido = recorridoEntre(
+        origen,
+        destino,
+        en: linea
+    ) {
+
+        print(
+            "\(linea): \(recorrido.joined(separator: " → "))"
+        )
+
+    } else {
+
+        print(
+            "\(linea): \(origen) → ... → \(destino)"
+        )
+    }
+}
+
+func mostrarReferenciasLlegada(
+    _ estacion: String
+) {
+
+    let refs = referenciasDeEstacion(estacion)
+
+    guard !refs.isEmpty else {
+        return
+    }
+
+    print("\nAl llegar puedes ubicarte con:")
+
+    for ref in refs.prefix(4) {
+        print("- \(ref.nombre)")
+    }
+}
+
+func buscarRuta(
+    origen: String,
+    destino: String
+) {
+
+    let origenes = buscarEstaciones(origen)
+    let destinos = buscarEstaciones(destino)
+
+    guard !origenes.isEmpty else {
+        print("No se encontró la estación de origen.")
+        return
+    }
+
+    guard !destinos.isEmpty else {
+        print("No se encontró la estación de destino.")
+        return
+    }
+
+    let lineasOrigen = Set(
+        origenes.map {
+            $0.linea
+        }
+    )
+
+    let lineasDestino = Set(
+        destinos.map {
+            $0.linea
+        }
+    )
+
+    let compartidas = lineasOrigen
+        .intersection(lineasDestino)
+        .sorted()
+
+    print("\n========================================")
+    print("RUTA SUGERIDA")
+    print("========================================")
+
+    print(
+        "Origen: \(origenes[0].estacion.nombre)"
+    )
+
+    print(
+        "Destino: \(destinos[0].estacion.nombre)\n"
+    )
+
+    // Caso 1: misma línea
+
+    for linea in compartidas {
+
+        if let recorrido = recorridoEntre(
+            origen,
+            destino,
+            en: linea
+        ) {
+
+            print("Usa \(linea).\n")
+
+            print(
+                recorrido.joined(
+                    separator: " → "
+                )
+            )
+
+            print(
+                "\nEstaciones del recorrido: \(recorrido.count)"
+            )
+
+            mostrarReferenciasLlegada(
+                destinos[0].estacion.nombre
+            )
+
+            return
+        }
+    }
+
+    // Caso 2: conexión directa
+
+    for lineaOrigen in lineasOrigen.sorted() {
+
+        for lineaDestino in lineasDestino.sorted() {
+
+            if let conexion = conexionesEntre(
+                lineaOrigen,
+                lineaDestino
+            ).first {
+
+                let puntoA = estacionConexion(
+                    conexion,
+                    para: lineaOrigen
+                )
+
+                let puntoB = estacionConexion(
+                    conexion,
+                    para: lineaDestino
+                )
+
+                print("1. Toma \(lineaOrigen).")
+
+                imprimirTramo(
+                    desde: origen,
+                    hasta: puntoA,
+                    linea: lineaOrigen
+                )
+
+                print(
+                    "2. Realiza la conexión: \(puntoA) → \(puntoB)."
+                )
+
+                print(
+                    "3. Continúa por \(lineaDestino)."
+                )
+
+                imprimirTramo(
+                    desde: puntoB,
+                    hasta: destino,
+                    linea: lineaDestino
+                )
+
+                print(
+                    "\nRuta de líneas: \(lineaOrigen) → \(lineaDestino)"
+                )
+
+                mostrarReferenciasLlegada(
+                    destinos[0].estacion.nombre
+                )
+
+                return
+            }
+        }
+    }
+
+    // Caso 3: una línea intermedia
+
+    for lineaOrigen in lineasOrigen.sorted() {
+
+        for primera in conexionesDeLinea(lineaOrigen) {
+
+            let intermedia = otraLinea(
+                primera,
+                desde: lineaOrigen
+            )
+
+            for lineaDestino in lineasDestino.sorted() {
+
+                guard intermedia != lineaDestino else {
+                    continue
+                }
+
+                if let segunda = conexionesEntre(
+                    intermedia,
+                    lineaDestino
+                ).first {
+
+                    let p1A = estacionConexion(
+                        primera,
+                        para: lineaOrigen
+                    )
+
+                    let p1B = estacionConexion(
+                        primera,
+                        para: intermedia
+                    )
+
+                    let p2A = estacionConexion(
+                        segunda,
+                        para: intermedia
+                    )
+
+                    let p2B = estacionConexion(
+                        segunda,
+                        para: lineaDestino
+                    )
+
+                    print("1. Toma \(lineaOrigen).")
+
+                    imprimirTramo(
+                        desde: origen,
+                        hasta: p1A,
+                        linea: lineaOrigen
+                    )
+
+                    print(
+                        "2. Conecta con \(intermedia): \(p1A) → \(p1B)."
+                    )
+
+                    imprimirTramo(
+                        desde: p1B,
+                        hasta: p2A,
+                        linea: intermedia
+                    )
+
+                    print(
+                        "3. Conecta con \(lineaDestino): \(p2A) → \(p2B)."
+                    )
+
+                    imprimirTramo(
+                        desde: p2B,
+                        hasta: destino,
+                        linea: lineaDestino
+                    )
+
+                    print(
+                        "\nRuta de líneas: \(lineaOrigen) → \(intermedia) → \(lineaDestino)"
+                    )
+
+                    mostrarReferenciasLlegada(
+                        destinos[0].estacion.nombre
+                    )
+
+                    return
+                }
+            }
+        }
+    }
+
+    print(
+        "No se encontró una ruta con las conexiones registradas."
+    )
+}
