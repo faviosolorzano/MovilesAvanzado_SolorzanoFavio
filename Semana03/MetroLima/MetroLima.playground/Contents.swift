@@ -192,3 +192,81 @@ let estacionesPorLinea: [String: [Estacion]] = [
         Estacion(nombre: "Atocongo", distrito: "San Juan de Miraflores", referenciaPrincipal: "Conexión con L1", tipoDato: .tentativo)
     ]
 ]
+
+
+// MARK: - Conexiones
+
+let conexiones: [Conexion] = [
+
+    Conexion(
+        lineaA: "L1",
+        estacionA: "Gamarra",
+        lineaB: "L2",
+        estacionB: "28 de Julio",
+        descripcion: "Conexión del eje Gamarra / 28 de Julio"
+    ),
+
+    Conexion(
+        lineaA: "L1",
+        estacionA: "Cabitos",
+        lineaB: "L3",
+        estacionB: "Cabitos",
+        descripcion: "Conexión entre L1 y L3"
+    ),
+
+    Conexion(
+        lineaA: "L1",
+        estacionA: "La Cultura",
+        lineaB: "L4",
+        estacionB: "La Cultura",
+        descripcion: "Conexión entre L1 y L4"
+    ),
+
+    Conexion(
+        lineaA: "L2",
+        estacionA: "Estación Central",
+        lineaB: "L3",
+        estacionB: "Estación Central",
+        descripcion: "Conexión entre L2 y L3"
+    ),
+
+    Conexion(
+        lineaA: "L2",
+        estacionA: "Carmen de la Legua",
+        lineaB: "L4",
+        estacionB: "Carmen de la Legua",
+        descripcion: "Conexión entre L2 y L4"
+    ),
+
+    Conexion(
+        lineaA: "L2",
+        estacionA: "Mercado Santa Anita",
+        lineaB: "L4",
+        estacionB: "Mercado Santa Anita",
+        descripcion: "Conexión entre L2 y L4"
+    ),
+
+    Conexion(
+        lineaA: "L3",
+        estacionA: "Conde de San Isidro",
+        lineaB: "L4",
+        estacionB: "Conde de San Isidro",
+        descripcion: "Conexión entre L3 y L4"
+    ),
+
+    Conexion(
+        lineaA: "L1",
+        estacionA: "Villa El Salvador",
+        lineaB: "L5",
+        estacionB: "Villa El Salvador",
+        descripcion: "Conexión utilizada para la simulación L1 - L5"
+    ),
+
+    Conexion(
+        lineaA: "L1",
+        estacionA: "Atocongo",
+        lineaB: "L6",
+        estacionB: "Atocongo",
+        descripcion: "Conexión utilizada para la simulación L1 - L6"
+    )
+]
