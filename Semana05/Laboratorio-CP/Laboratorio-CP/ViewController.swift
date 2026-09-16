@@ -20,6 +20,10 @@ class ViewController: UIViewController {
 
     @IBAction func calcularPrestamo(_ sender: Any) {
         
+        let capital = Double(capitalTextField.text ?? "") ?? 0
+        let tasaAnual = Double(tasaTextField.text ?? "") ?? 0
+        let plazoAnios = Double(plazoTextField.text ?? "") ?? 0
+        
         
     
 }
