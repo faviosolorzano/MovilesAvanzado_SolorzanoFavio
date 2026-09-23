@@ -30,6 +30,24 @@ class ViewController: UIViewController {
             return
         }
         
+        // Convertir la tasa anual a tasa mensual
+        let tasaMensual = (tasaAnual / 100) / 12
+
+        // Calcular el número total de pagos
+        let numeroPagos = plazoAnios * 12
+
+        // Calcular la cuota mensual
+        let potencia = pow(1 + tasaMensual, numeroPagos)
+
+        let cuotaMensual = capital *
+            (tasaMensual * potencia) /
+            (potencia - 1)
+
+        // Mostrar la cuota mensual
+        resultLabel.text = "Cuota mensual: S/ \(String(format: "%.2f", cuotaMensual))"
+        
+        
+        
     
 }
 
