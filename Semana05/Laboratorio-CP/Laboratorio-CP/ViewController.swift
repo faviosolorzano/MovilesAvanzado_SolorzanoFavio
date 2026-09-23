@@ -24,6 +24,11 @@ class ViewController: UIViewController {
         let tasaAnual = Double(tasaTextField.text ?? "") ?? 0
         let plazoAnios = Double(plazoTextField.text ?? "") ?? 0
         
+        // Validar los datos ingresados
+        if capital <= 0 || tasaAnual <= 0 || plazoAnios <= 0 {
+            resultLabel.text = "Por favor, ingrese valores válidos."
+            return
+        }
         
     
 }
