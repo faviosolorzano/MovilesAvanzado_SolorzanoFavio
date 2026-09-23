@@ -43,10 +43,14 @@ class ViewController: UIViewController {
             (tasaMensual * potencia) /
             (potencia - 1)
 
-        // Mostrar la cuota mensual
-        resultLabel.text = "Cuota mensual: S/ \(String(format: "%.2f", cuotaMensual))"
-        
-        
+        // Calcular el monto total a pagar
+        let montoTotal = cuotaMensual * numeroPagos
+
+        // Mostrar los resultados
+        resultLabel.text = """
+        Cuota mensual: S/ \(String(format: "%.2f", cuotaMensual))
+        Monto total: S/ \(String(format: "%.2f", montoTotal))
+        """
         
     
 }
