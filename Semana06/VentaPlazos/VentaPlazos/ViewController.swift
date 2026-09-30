@@ -13,6 +13,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var precioTextField: UITextField!
     @IBOutlet weak var tasaTextField: UITextField!
     @IBOutlet weak var plazoTextField: UITextField!
+    var ventaCalculada: VentaModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,6 +47,47 @@ class ViewController: UIViewController {
             )
         }
 
+        override func shouldPerformSegue(
+            withIdentifier identifier: String,
+            sender: Any?
+        ) -> Bool {
+
+            if identifier == "mostrarResumen" {
+
+                guard let venta = calcularVenta() else {
+
+                    let alerta = UIAlertController(
+                        title: "Datos incorrectos",
+                        message: "Ingrese valores válidos.",
+                        preferredStyle: .alert
+                    )
+
+                    alerta.addAction(
+                        UIAlertAction(title: "Aceptar", style: .default)
+                    )
+
+                    present(alerta, animated: true)
+
+                    return false
+                }
+
+                ventaCalculada = venta
+            }
+
+            return true
+        }
+
+        override func prepare(
+            for segue: UIStoryboardSegue,
+            sender: Any?
+        ) {
+
+            if segue.identifier == "mostrarResumen",
+               let destino = segue.destination as? ResumenViewController {
+
+                destino.venta = ventaCalculada
+            }
+        }
 
 }
 

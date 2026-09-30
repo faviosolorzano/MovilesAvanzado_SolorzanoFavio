@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="25098" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="25098" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="j3H-QT-Pjw">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="25073"/>
@@ -60,6 +60,9 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="gray" title="CALCULAR"/>
+                                <connections>
+                                    <segue destination="sgP-Qu-giV" kind="show" identifier="mostrarResumen" id="ada-U7-F1m"/>
+                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="VENTA A PLAZOS" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nku-KE-7Fc">
                                 <rect key="frame" x="128" y="118" width="137" height="21"/>
@@ -72,6 +75,7 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <navigationItem key="navigationItem" id="IRy-YU-gzC"/>
                     <connections>
                         <outlet property="plazoTextField" destination="bdi-DG-whH" id="WH7-p2-6Du"/>
                         <outlet property="precioTextField" destination="mhw-t4-KSh" id="RSX-K5-Il4"/>
@@ -80,7 +84,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="135.1145038167939" y="110.56338028169014"/>
+            <point key="canvasLocation" x="1061.8320610687022" y="110.56338028169014"/>
         </scene>
         <!--Resumen View Controller-->
         <scene sceneID="UXM-A2-gXi">
@@ -171,6 +175,7 @@
                         <viewLayoutGuide key="safeArea" id="hzj-S4-2xl"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <navigationItem key="navigationItem" id="MOe-5M-wjB"/>
                     <connections>
                         <outlet property="cuotaLabel" destination="beP-hz-6sB" id="kEj-nk-JNU"/>
                         <outlet property="plazoLabel" destination="TeA-dx-asB" id="OsT-5u-0ll"/>
@@ -181,7 +186,25 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UgV-hV-FQ2" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="878.62595419847321" y="110.56338028169014"/>
+            <point key="canvasLocation" x="1984" y="111"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Nfl-C7-ShN">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="j3H-QT-Pjw" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="9Xd-AP-pjN">
+                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="jQm-PB-0cp"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Omb-av-LZW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="135.1145038167939" y="110.56338028169014"/>
         </scene>
     </scenes>
     <resources>
