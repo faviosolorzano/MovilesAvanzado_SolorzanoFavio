@@ -73,9 +73,9 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
-                        <outlet property="plazoTextField" destination="bdi-DG-whH" id="hPn-R9-tyF"/>
-                        <outlet property="precioTextField" destination="8bC-Xf-vdC" id="mEd-8Z-oFQ"/>
-                        <outlet property="tasaTextField" destination="awe-k5-zwr" id="zZ8-hg-vtR"/>
+                        <outlet property="plazoTextField" destination="bdi-DG-whH" id="WH7-p2-6Du"/>
+                        <outlet property="precioTextField" destination="mhw-t4-KSh" id="RSX-K5-Il4"/>
+                        <outlet property="tasaTextField" destination="awe-k5-zwr" id="KlA-cL-Xsl"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
