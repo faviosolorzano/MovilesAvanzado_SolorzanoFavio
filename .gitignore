@@ -1,2 +1,6 @@
 .DS_Store
 *.xcuserstate
+xcuserdata/
+*.xcuserstate
+*.backup
+.DS_Store
