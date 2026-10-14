@@ -2,7 +2,7 @@
 //  SceneDelegate.swift
 //  Lab06-Navegacion
 //
-//  Created by Tecsup on 30/09/26.
+//  Created by Alexander on 30/09/26.
 //
 
 import UIKit
