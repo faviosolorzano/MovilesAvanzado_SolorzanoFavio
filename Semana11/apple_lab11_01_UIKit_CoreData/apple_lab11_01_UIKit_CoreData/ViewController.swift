@@ -2,11 +2,13 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchResultsUpdating {
 
     @IBOutlet weak var TablaContacto: UITableView!
 
     var contactos = [Contacto]()
+    var contactosFiltrados = [Contacto]()
+    var buscando = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,6 +18,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
         mostrarRutaBaseDeDatos()
         cargarInfoCoreData()
+        
+        let buscador = UISearchController(searchResultsController: nil)
+        buscador.searchResultsUpdater = self
+        buscador.obscuresBackgroundDuringPresentation = false
+        buscador.searchBar.placeholder = "Buscar contacto por nombre"
+
+        navigationItem.searchController = buscador
+        navigationItem.hidesSearchBarWhenScrolling = false
+        definesPresentationContext = true
     }
 
     // Conexion Core Data
@@ -52,7 +63,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
-        return contactos.count
+        return buscando ? contactosFiltrados.count : contactos.count
     }
 
     func tableView(_ tableView: UITableView,
@@ -63,7 +74,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             for: indexPath
         )
 
-        let contacto = contactos[indexPath.row]
+        let contacto = buscando
+            ? contactosFiltrados[indexPath.row]
+            : contactos[indexPath.row]
 
         celda.textLabel?.text = contacto.nombre
         celda.detailTextLabel?.text =
@@ -161,15 +174,24 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func eliminarContacto(at indexPath: IndexPath) {
 
         let contexto = conexion()
-        let contacto = contactos[indexPath.row]
+        let contacto = buscando
+            ? contactosFiltrados[indexPath.row]
+            : contactos[indexPath.row]
 
         contexto.delete(contacto)
 
         do {
             try contexto.save()
-            contactos.remove(at: indexPath.row)
-            TablaContacto.deleteRows(at: [indexPath], with: .automatic)
+            cargarInfoCoreData()
+
+            if buscando {
+                let texto = navigationItem.searchController?.searchBar.text ?? ""
+                contactosFiltrados = buscarContactos(texto: texto)
+            }
+
+            TablaContacto.reloadData()
         } catch {
+            contexto.rollback()
             print("Error al eliminar: \(error)")
         }
     }
@@ -181,5 +203,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         if editingStyle == .delete {
             eliminarContacto(at: indexPath)
         }
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        let texto = searchController.searchBar.text ?? ""
+        buscando = !texto.isEmpty
+
+        if buscando {
+            contactosFiltrados = buscarContactos(texto: texto)
+        } else {
+            contactosFiltrados = []
+        }
+
+        TablaContacto.reloadData()
     }
 }
