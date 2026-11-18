@@ -7,6 +7,7 @@ struct ProveedoresView: View {
     var esSupervisor: Bool = false
 
     @Environment(\.modelContext) private var context
+
     @Query(sort: \Proveedor.nombre)
     private var proveedores: [Proveedor]
 
@@ -18,73 +19,128 @@ struct ProveedoresView: View {
     @State private var mensajeError = ""
 
     var body: some View {
-        List {
-            if proveedores.isEmpty {
-                ContentUnavailableView(
-                    "Sin proveedores",
-                    systemImage: "truck.box",
-                    description: Text(
-                        esSupervisor
-                        ? "Presiona + para registrar un proveedor."
-                        : "No hay proveedores registrados."
-                    )
-                )
-            } else {
-                ForEach(proveedores) { proveedor in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(proveedor.nombre)
-                            .font(.headline)
+        VStack(spacing: 0) {
 
-                        Text("RUC: \(proveedor.ruc)")
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 5)
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Proveedores")
+                        .font(.largeTitle.bold())
+
+                    Text("\(proveedores.count) registrados")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                .onDelete(perform: eliminar)
-                .deleteDisabled(!esSupervisor)
-            }
-        }
-        .navigationTitle("Proveedores")
-        .toolbar {
-            if esSupervisor {
-                ToolbarItem(placement: .topBarTrailing) {
+
+                Spacer()
+
+                if esSupervisor {
                     Button {
+                        nombre = ""
+                        ruc = ""
                         mostrarFormulario = true
                     } label: {
                         Image(systemName: "plus")
+                            .font(.title3.bold())
+                            .foregroundStyle(.white)
+                            .frame(width: 46, height: 46)
+                            .background(.blue)
+                            .clipShape(Circle())
                     }
+                    .accessibilityLabel("Agregar proveedor")
                 }
+            }
+            .padding()
+
+            if proveedores.isEmpty {
+                Spacer()
+
+                ContentUnavailableView(
+                    "No hay proveedores",
+                    systemImage: "building.2",
+                    description: Text(
+                        esSupervisor
+                        ? "Presiona + para agregar un proveedor."
+                        : "No hay proveedores registrados."
+                    )
+                )
+
+                Spacer()
+            } else {
+                List {
+                    ForEach(proveedores) { proveedor in
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(proveedor.nombre)
+                                .font(.headline)
+
+                            Text("RUC: \(proveedor.ruc)")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 6)
+                    }
+                    .onDelete(perform: eliminar)
+                    .deleteDisabled(!esSupervisor)
+                }
+                .listStyle(.plain)
             }
         }
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $mostrarFormulario) {
-            NavigationStack {
-                Form {
-                    Section("Datos del proveedor") {
-                        TextField("Nombre", text: $nombre)
-
-                        TextField("RUC", text: $ruc)
-                            .keyboardType(.numberPad)
-                    }
-
-                    Button("Guardar proveedor") {
-                        guardar()
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-                .navigationTitle("Nuevo proveedor")
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancelar") {
-                            mostrarFormulario = false
-                        }
-                    }
-                }
-            }
+            formularioProveedor
         }
         .alert("Aviso", isPresented: $mostrarError) {
             Button("Aceptar", role: .cancel) {}
         } message: {
             Text(mensajeError)
+        }
+    }
+
+    private var formularioProveedor: some View {
+        NavigationStack {
+            Form {
+                Section("Información del proveedor") {
+                    TextField("Razón social", text: $nombre)
+                        .textInputAutocapitalization(.words)
+
+                    HStack {
+                        Text("RUC")
+                        Spacer()
+
+                        TextField("11 dígitos", text: $ruc)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                            .onChange(of: ruc) { _, nuevo in
+                                ruc = String(
+                                    nuevo.filter {
+                                        $0.isASCII && $0.isNumber
+                                    }.prefix(11)
+                                )
+                            }
+                    }
+                }
+
+                Section {
+                    Button {
+                        guardar()
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text("Guardar proveedor")
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Nuevo proveedor")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") {
+                        mostrarFormulario = false
+                    }
+                }
+            }
         }
     }
 
@@ -95,43 +151,37 @@ struct ProveedoresView: View {
             in: .whitespacesAndNewlines
         )
 
-        let rucLimpio = ruc.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
-
-        guard !nombreLimpio.isEmpty,
-              rucLimpio.count == 11,
-              rucLimpio.allSatisfy({ $0.isNumber }) else {
-            mensajeError = "Ingresa un nombre y un RUC de 11 dígitos."
-            mostrarError = true
+        guard !nombreLimpio.isEmpty else {
+            mostrarMensaje("Ingresa la razón social del proveedor.")
             return
         }
 
-        guard !proveedores.contains(where: {
-            $0.ruc == rucLimpio
-        }) else {
-            mensajeError = "Este RUC ya está registrado."
-            mostrarError = true
+        guard ruc.count == 11,
+              ruc.allSatisfy({ $0.isASCII && $0.isNumber }) else {
+            mostrarMensaje("El RUC debe tener 11 números.")
+            return
+        }
+
+        guard !proveedores.contains(where: { $0.ruc == ruc }) else {
+            mostrarMensaje("Ya existe un proveedor con ese RUC.")
             return
         }
 
         let proveedor = Proveedor(
             nombre: nombreLimpio,
-            ruc: rucLimpio
+            ruc: ruc
         )
 
         context.insert(proveedor)
 
         do {
             try context.save()
-
+            mostrarFormulario = false
             nombre = ""
             ruc = ""
-            mostrarFormulario = false
         } catch {
             context.rollback()
-            mensajeError = "No se pudo guardar el proveedor."
-            mostrarError = true
+            mostrarMensaje("Error al guardar: \(error.localizedDescription)")
         }
     }
 
@@ -146,8 +196,12 @@ struct ProveedoresView: View {
             try context.save()
         } catch {
             context.rollback()
-            mensajeError = "No se pudo eliminar el proveedor."
-            mostrarError = true
+            mostrarMensaje("No se pudo eliminar el proveedor.")
         }
+    }
+
+    private func mostrarMensaje(_ mensaje: String) {
+        mensajeError = mensaje
+        mostrarError = true
     }
 }

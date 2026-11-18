@@ -11,94 +11,145 @@ struct ProductosView: View {
     @Query(sort: \Producto.nombre)
     private var productos: [Producto]
 
-    @State private var nombre = ""
-    @State private var categoria = ""
-    @State private var stock = ""
-    @State private var costo = ""
+    @Query(sort: \Proveedor.nombre)
+    private var proveedores: [Proveedor]
 
     @State private var mostrarFormulario = false
+    @State private var productoEditar: Producto?
+
+    @State private var nombre = ""
+    @State private var categoria = "Tecnología"
+    @State private var stock = "0"
+    @State private var costo = ""
+    @State private var proveedorID: PersistentIdentifier?
+
     @State private var mostrarError = false
     @State private var mensajeError = ""
 
+    private let categorias = [
+        "Tecnología",
+        "Computación",
+        "Oficina",
+        "Papelería",
+        "Mobiliario",
+        "Limpieza",
+        "Herramientas",
+        "Otros"
+    ]
+
+    private var proveedorSeleccionado: Proveedor? {
+        proveedores.first {
+            $0.persistentModelID == proveedorID
+        }
+    }
+
     var body: some View {
-        List {
-            if productos.isEmpty {
-                ContentUnavailableView {
-                    Label(
-                        "No hay productos registrados",
-                        systemImage: "shippingbox"
-                    )
-                } description: {
-                    Text(
-                        esSupervisor
-                        ? "Presiona + para agregar un producto."
-                        : "Todavía no hay productos disponibles."
-                    )
-                }
-            } else {
-                ForEach(productos) { producto in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(producto.nombre)
-                            .font(.headline)
+        VStack(spacing: 0) {
 
-                        Text("Categoría: \(producto.categoria)")
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Productos")
+                        .font(.title2.bold())
 
-                        Text("Stock: \(producto.stock)")
-
-                        Text(
-                            "Costo promedio: S/ \(producto.costoPromedio, specifier: "%.2f")"
-                        )
+                    Text("\(productos.count) registrados")
+                        .font(.caption)
                         .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 5)
                 }
-                .onDelete(perform: eliminar)
-                .deleteDisabled(!esSupervisor)
+
+                Spacer()
+
+                if esSupervisor {
+                    Button {
+                        nuevoProducto()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(width: 44, height: 44)
+                            .background(.blue)
+                            .clipShape(Circle())
+                    }
+                }
+            }
+            .padding()
+
+            if productos.isEmpty {
+                ContentUnavailableView(
+                    "Sin productos",
+                    systemImage: "shippingbox",
+                    description: Text(
+                        "El Supervisor debe registrar productos."
+                    )
+                )
+            } else {
+                List {
+                    ForEach(productos) { producto in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(producto.nombre)
+                                    .font(.headline)
+
+                                Spacer()
+
+                                if esSupervisor {
+                                    Button {
+                                        editarProducto(producto)
+                                    } label: {
+                                        Image(
+                                            systemName: "pencil.circle"
+                                        )
+                                        .font(.title3)
+                                    }
+                                    .buttonStyle(.borderless)
+                                }
+                            }
+
+                            Text(producto.categoria)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            Label(
+                                producto.proveedorAsignado?.nombre
+                                    ?? "Sin proveedor asignado",
+                                systemImage: "building.2"
+                            )
+                            .font(.subheadline)
+                            .foregroundStyle(
+                                producto.proveedorAsignado == nil
+                                    ? .orange
+                                    : .secondary
+                            )
+
+                            HStack {
+                                Label(
+                                    "Stock: \(producto.stock)",
+                                    systemImage: "shippingbox"
+                                )
+
+                                Spacer()
+
+                                Text(
+                                    producto.costoPromedio,
+                                    format: .currency(code: "PEN")
+                                )
+                                .fontWeight(.semibold)
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding(.vertical, 5)
+                    }
+                    .onDelete(
+                        perform: esSupervisor
+                            ? eliminarProductos
+                            : nil
+                    )
+                }
             }
         }
         .navigationTitle("Productos")
-        .toolbar {
-            if esSupervisor {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        mostrarFormulario = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
-        }
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $mostrarFormulario) {
-            NavigationStack {
-                Form {
-                    Section("Datos del producto") {
-                        TextField("Nombre", text: $nombre)
-
-                        TextField("Categoría", text: $categoria)
-
-                        TextField("Stock inicial", text: $stock)
-                            .keyboardType(.numberPad)
-
-                        TextField("Costo promedio", text: $costo)
-                            .keyboardType(.decimalPad)
-                    }
-
-                    Section {
-                        Button("Guardar producto") {
-                            guardar()
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                }
-                .navigationTitle("Nuevo producto")
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancelar") {
-                            mostrarFormulario = false
-                        }
-                    }
-                }
-            }
+            formularioProducto
         }
         .alert("Aviso", isPresented: $mostrarError) {
             Button("Aceptar", role: .cancel) {}
@@ -107,59 +158,155 @@ struct ProductosView: View {
         }
     }
 
-    private func guardar() {
-        guard esSupervisor else { return }
+    private var formularioProducto: some View {
+        NavigationStack {
+            Form {
+                Section("Información del producto") {
+                    TextField("Nombre", text: $nombre)
 
+                    Picker("Categoría", selection: $categoria) {
+                        ForEach(categorias, id: \.self) { item in
+                            Text(item).tag(item)
+                        }
+                    }
+                }
+
+                Section("Proveedor") {
+                    Picker(
+                        "Proveedor asignado",
+                        selection: $proveedorID
+                    ) {
+                        Text("Seleccionar")
+                            .tag(nil as PersistentIdentifier?)
+
+                        ForEach(proveedores) { item in
+                            Text(item.nombre)
+                                .tag(
+                                    Optional(item.persistentModelID)
+                                )
+                        }
+                    }
+
+                    if proveedores.isEmpty {
+                        Text(
+                            "Registra primero un proveedor."
+                        )
+                        .foregroundStyle(.orange)
+                    }
+                }
+
+                Section("Inventario y costo") {
+                    TextField("Stock", text: $stock)
+                        .keyboardType(.numberPad)
+                        .onChange(of: stock) { _, nuevo in
+                            stock = String(
+                                nuevo.filter {
+                                    $0.isASCII && $0.isNumber
+                                }
+                            )
+                        }
+
+                    TextField("Costo unitario S/", text: $costo)
+                        .keyboardType(.decimalPad)
+                }
+            }
+            .navigationTitle(
+                productoEditar == nil
+                    ? "Nuevo producto"
+                    : "Editar producto"
+            )
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") {
+                        mostrarFormulario = false
+                    }
+                }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Guardar") {
+                        guardarProducto()
+                    }
+                }
+            }
+        }
+    }
+
+    private func nuevoProducto() {
+        productoEditar = nil
+        nombre = ""
+        categoria = "Tecnología"
+        stock = "0"
+        costo = ""
+        proveedorID = nil
+        mostrarFormulario = true
+    }
+
+    private func editarProducto(_ producto: Producto) {
+        productoEditar = producto
+        nombre = producto.nombre
+        categoria = producto.categoria
+        stock = "\(producto.stock)"
+        costo = "\(producto.costoPromedio)"
+        proveedorID =
+            producto.proveedorAsignado?.persistentModelID
+
+        mostrarFormulario = true
+    }
+
+    private func guardarProducto() {
         let nombreLimpio = nombre.trimmingCharacters(
             in: .whitespacesAndNewlines
         )
 
-        let categoriaLimpia = categoria.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
+        let costoNumero = Double(
+            costo.replacingOccurrences(of: ",", with: ".")
+        ) ?? 0
 
         guard !nombreLimpio.isEmpty,
-              !categoriaLimpia.isEmpty,
-              let stockValor = Int(stock),
-              stockValor >= 0,
-              let costoValor = Double(
-                costo.replacingOccurrences(of: ",", with: ".")
-              ),
-              costoValor >= 0 else {
+              let stockNumero = Int(stock),
+              stockNumero >= 0,
+              costoNumero > 0,
+              costoNumero.isFinite,
+              let proveedor = proveedorSeleccionado else {
+            mensajeError = """
+            Completa todos los campos.
 
-            mensajeError = "Completa correctamente todos los campos."
+            El costo debe ser mayor que cero y debes asignar un proveedor.
+            """
             mostrarError = true
             return
         }
 
-        let producto = Producto(
-            nombre: nombreLimpio,
-            categoria: categoriaLimpia,
-            stock: stockValor,
-            costoPromedio: costoValor
-        )
+        if let producto = productoEditar {
+            producto.nombre = nombreLimpio
+            producto.categoria = categoria
+            producto.stock = stockNumero
+            producto.costoPromedio = costoNumero
+            producto.proveedorAsignado = proveedor
+        } else {
+            let producto = Producto(
+                nombre: nombreLimpio,
+                categoria: categoria,
+                stock: stockNumero,
+                costoPromedio: costoNumero,
+                proveedorAsignado: proveedor
+            )
 
-        context.insert(producto)
+            context.insert(producto)
+        }
 
         do {
             try context.save()
-
-            nombre = ""
-            categoria = ""
-            stock = ""
-            costo = ""
-
             mostrarFormulario = false
         } catch {
             context.rollback()
-            mensajeError = "No se pudo guardar el producto."
+            mensajeError = error.localizedDescription
             mostrarError = true
         }
     }
 
-    private func eliminar(at offsets: IndexSet) {
-        guard esSupervisor else { return }
-
+    private func eliminarProductos(at offsets: IndexSet) {
         for indice in offsets {
             context.delete(productos[indice])
         }

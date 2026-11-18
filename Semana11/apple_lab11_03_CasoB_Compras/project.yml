@@ -1,0 +1,20 @@
+name: apple_lab11_03_CasoB_Compras
+
+options:
+  deploymentTarget:
+    iOS: "17.0"
+
+targets:
+  apple_lab11_03_CasoB_Compras:
+    type: application
+    platform: iOS
+    sources:
+      - path: apple_lab11_03_CasoB_Compras
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tecsup.casobcompras
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGNING_ALLOWED: NO

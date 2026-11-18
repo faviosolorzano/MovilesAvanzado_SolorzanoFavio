@@ -28,7 +28,7 @@ struct InicioView: View {
                 }
 
                 NavigationStack {
-                    AprobacionesView()
+                    AprobacionesMultiplesView()
                 }
                 .tabItem {
                     Label(

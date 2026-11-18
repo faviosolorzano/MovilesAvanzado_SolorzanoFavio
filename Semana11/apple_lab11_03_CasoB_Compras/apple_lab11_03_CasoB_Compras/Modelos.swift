@@ -2,7 +2,6 @@
 import Foundation
 import SwiftData
 
-// MARK: - USUARIO
 @Model
 final class Usuario {
     var nombre: String
@@ -13,7 +12,12 @@ final class Usuario {
     @Relationship(deleteRule: .deny, inverse: \Compra.comprador)
     var compras: [Compra] = []
 
-    init(nombre: String, usuario: String, clave: String, rol: String) {
+    init(
+        nombre: String,
+        usuario: String,
+        clave: String,
+        rol: String
+    ) {
         self.nombre = nombre
         self.usuario = usuario
         self.clave = clave
@@ -21,7 +25,6 @@ final class Usuario {
     }
 }
 
-// MARK: - PROVEEDOR
 @Model
 final class Proveedor {
     var nombre: String
@@ -36,13 +39,15 @@ final class Proveedor {
     }
 }
 
-// MARK: - PRODUCTO
 @Model
 final class Producto {
     var nombre: String
     var categoria: String
     var stock: Int
     var costoPromedio: Double
+
+    // Relación nueva: proveedor asignado al producto.
+    var proveedorAsignado: Proveedor?
 
     @Relationship(deleteRule: .deny, inverse: \Compra.producto)
     var compras: [Compra] = []
@@ -51,16 +56,17 @@ final class Producto {
         nombre: String,
         categoria: String,
         stock: Int,
-        costoPromedio: Double
+        costoPromedio: Double,
+        proveedorAsignado: Proveedor? = nil
     ) {
         self.nombre = nombre
         self.categoria = categoria
         self.stock = stock
         self.costoPromedio = costoPromedio
+        self.proveedorAsignado = proveedorAsignado
     }
 }
 
-// MARK: - COMPRA
 @Model
 final class Compra {
     var fecha: Date
@@ -86,37 +92,31 @@ final class Compra {
         proveedor: Proveedor,
         producto: Producto
     ) {
-        // Calcular valores antes de inicializar
-        let fechaActual = Date()
+        let ahora = Date()
         let subtotal = Double(cantidad) * costoUnitario
-        let igvCalculado = subtotal * 0.18
-        let totalCalculado = subtotal + igvCalculado
+        let impuesto = subtotal * 0.18
+        let totalCompra = subtotal + impuesto
 
-        let fechaVencimiento = Calendar.current.date(
+        self.fecha = ahora
+        self.cantidad = cantidad
+        self.costoUnitario = costoUnitario
+        self.igv = impuesto
+        self.total = totalCompra
+        self.alCredito = alCredito
+
+        self.vence = Calendar.current.date(
             byAdding: .day,
             value: 30,
-            to: fechaActual
-        ) ?? fechaActual
+            to: ahora
+        ) ?? ahora
 
-        let estadoInicial = totalCalculado < 5000	
+        self.estado = totalCompra < 5000
             ? "Aprobada"
             : "Pendiente"
 
-        let pagadaInicial = !alCredito && estadoInicial == "Aprobada"
-
-        // Inicializar propiedades
-        self.fecha = fechaActual
-        self.cantidad = cantidad
-        self.costoUnitario = costoUnitario
-        self.igv = igvCalculado
-        self.total = totalCalculado
-        self.alCredito = alCredito
-        self.vence = fechaVencimiento
-        self.estado = estadoInicial
-        self.pagada = pagadaInicial
+        self.pagada = !alCredito && totalCompra < 5000
         self.motivoRechazo = nil
 
-        // Relaciones
         self.comprador = comprador
         self.proveedor = proveedor
         self.producto = producto

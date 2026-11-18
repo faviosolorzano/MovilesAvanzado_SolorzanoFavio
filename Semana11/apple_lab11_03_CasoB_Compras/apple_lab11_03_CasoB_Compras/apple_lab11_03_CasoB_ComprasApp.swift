@@ -12,7 +12,9 @@ struct apple_lab11_03_CasoB_ComprasApp: App {
             Usuario.self,
             Proveedor.self,
             Producto.self,
-            Compra.self
+            Compra.self,
+            CompraMultiple.self,
+            DetalleCompraMultiple.self
         ])
     }
 }
