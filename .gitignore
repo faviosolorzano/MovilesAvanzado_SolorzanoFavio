@@ -4,3 +4,6 @@ xcuserdata/
 *.xcuserstate
 *.backup
 .DS_Store
+
+# Configuracion local de Firebase
+GoogleService-Info.plist

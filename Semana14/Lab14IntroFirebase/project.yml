@@ -1,0 +1,29 @@
+name: Lab14IntroFirebase
+options:
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 11.14.0
+targets:
+  Lab14IntroFirebase:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pe.edu.tecsup.dma.Lab14IntroFirebase
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        SWIFT_VERSION: "5.0"
+    dependencies:
+      - package: Firebase
+        product: FirebaseCore
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: Firebase
+        product: FirebaseDatabase

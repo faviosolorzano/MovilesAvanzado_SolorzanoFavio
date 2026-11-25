@@ -1,0 +1,16 @@
+name: Semana13_API
+options:
+  deploymentTarget:
+    iOS: "17.0"
+targets:
+  Semana13_API:
+    type: application
+    platform: iOS
+    sources:
+      - Semana13_API
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pe.edu.tecsup.Semana13_API
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        SWIFT_VERSION: "5.0"
